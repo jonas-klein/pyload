@@ -624,6 +624,12 @@ class XDCC(BaseDownloader):
             "Send custom String on CTCP Version request",
             "pyLoad! IRC Interface",
         ),
+        (
+            "prefab_channel_opts",
+            "str",
+            "Join prefab channel before joining channel (format: ircserver/channel, ...)",
+            "",
+        ),
     ]
 
     __description__ = """Download from IRC XDCC bot"""
@@ -722,10 +728,19 @@ class XDCC(BaseDownloader):
             if len(_x.split("/")) == 3
         ]
 
+        prefab_channel_opts = [
+            _x.split("/")
+            for _x in self.config.get("prefab_channel_opts").strip().split(",")
+            if len(_x.split("/")) == 2
+        ]
+
         #: Remove leading '#' from channel name and custom channel name
         for opt in channel_opts:
             opt[1] = opt[1][1:] if opt[1].startswith("#") else opt[1]
             opt[2] = opt[2][1:] if opt[2].startswith("#") else opt[2]
+
+        for opt in prefab_channel_opts:
+            opt[1] = opt[1][1:] if opt[1].startswith("#") else opt[1]
 
         #: Change request type
         self.req.close()
@@ -757,6 +772,13 @@ class XDCC(BaseDownloader):
                                 and opt[1].lower() == chan.lower()
                             ):
                                 if not self.irc_client.join_channel(opt[2]):
+                                    self.fail(self._("Cannot join channel"))
+
+                        for opt in prefab_channel_opts:
+                            if (
+                                opt[0].lower() == host.lower()
+                            ):
+                                if not self.irc_client.join_channel(opt[1]):
                                     self.fail(self._("Cannot join channel"))
 
                         if not self.irc_client.join_channel(chan):
