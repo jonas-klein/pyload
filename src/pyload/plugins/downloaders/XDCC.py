@@ -193,7 +193,7 @@ class IRC:
                             self.irc_sock.send(
                                 to_bytes(
                                     "NOTICE {} :\x01VERSION {}\x01\r\n".format(
-                                        sender_nick, "pyLoad! IRC Interface"
+                                        sender_nick, self.config.get("ctcp_version_response")
                                     )
                                 )
                             )
@@ -617,6 +617,12 @@ class XDCC(BaseDownloader):
             "str",
             "Join custom channel before joining channel (format: ircserver/channel/customchannel, ...)",
             "",
+        ),
+        (
+            "ctcp_version_response",
+            "str",
+            "Send custom String on CTCP Version request",
+            "pyLoad! IRC Interface",
         ),
     ]
 
